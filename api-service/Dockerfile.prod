@@ -1,0 +1,24 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+COPY . .
+RUN yarn build
+RUN npx tsc prisma/seed.ts --outDir dist/prisma --esModuleInterop --skipLibCheck
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN apk add --no-cache openssl
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+
+RUN npx prisma generate
+
+EXPOSE 4000
+CMD ["node", "dist/server.js"]
