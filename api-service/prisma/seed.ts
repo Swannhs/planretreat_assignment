@@ -103,7 +103,8 @@ const venues = [
 
 async function main() {
     console.log('Start seeding ...')
-    // Clear existing venues to avoid duplicates
+    // Clear existing data to avoid duplicates and FK violations
+    await prisma.bookingInquiry.deleteMany()
     await prisma.venue.deleteMany()
 
     for (const venue of venues) {

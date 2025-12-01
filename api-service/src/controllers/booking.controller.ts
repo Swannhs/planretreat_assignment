@@ -61,3 +61,19 @@ export const createBooking = async (req: Request, res: Response) => {
         return errorResponse(res, ErrorCodes.INTERNAL_ERROR, 'An unexpected error occurred', 500)
     }
 }
+
+export const getBookings = async (req: Request, res: Response) => {
+    try {
+        const venueId = req.query.venueId ? parseInt(req.query.venueId as string) : undefined
+
+        if (!venueId || isNaN(venueId)) {
+            return errorResponse(res, ErrorCodes.VALIDATION_ERROR, 'Venue ID is required', 400)
+        }
+
+        const bookings = await bookingService.getBookingsByVenueId(venueId)
+        return successResponse(res, bookings)
+    } catch (error: any) {
+        console.error('[API] Error fetching bookings:', error)
+        return errorResponse(res, ErrorCodes.INTERNAL_ERROR, 'Failed to fetch bookings', 500)
+    }
+}

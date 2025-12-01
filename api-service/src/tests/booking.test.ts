@@ -17,6 +17,11 @@ describe('POST /api/bookings', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+        jest.spyOn(console, 'error').mockImplementation(() => { })
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
     })
 
     it('should create a booking successfully', async () => {

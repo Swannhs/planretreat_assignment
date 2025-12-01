@@ -68,6 +68,10 @@ export class BookingService {
     async getBookingById(id: number) {
         return bookingRepository.findById(id)
     }
+
+    async getBookingsByVenueId(venueId: number) {
+        return bookingRepository.findByVenueId(venueId)
+    }
 }
 
 export const bookingService = new BookingService()

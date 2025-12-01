@@ -1,7 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Venue } from '@/types'
+
+import DatePicker from 'react-datepicker'
+import "react-datepicker/dist/react-datepicker.css"
 
 interface BookingFormProps {
     venue: Venue
@@ -12,21 +15,50 @@ export default function BookingForm({ venue, onClose }: BookingFormProps) {
     const [formData, setFormData] = useState({
         companyName: '',
         email: '',
-        startDate: '',
-        endDate: '',
         attendeeCount: '',
     })
+    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+    const [startDate, endDate] = dateRange;
+    const [excludedDates, setExcludedDates] = useState<Date[]>([])
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [success, setSuccess] = useState(false)
+
+    useEffect(() => {
+        const fetchBookings = async () => {
+            try {
+                const res = await fetch(`/api/bookings?venueId=${venue.id}`)
+                if (res.ok) {
+                    const data = await res.json()
+                    if (data.success && Array.isArray(data.data)) {
+                        const dates: Date[] = []
+                        data.data.forEach((booking: any) => {
+                            let current = new Date(booking.startDate)
+                            const end = new Date(booking.endDate)
+                            while (current <= end) {
+                                dates.push(new Date(current))
+                                current.setDate(current.getDate() + 1)
+                            }
+                        })
+                        setExcludedDates(dates)
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to fetch bookings', err)
+            }
+        }
+
+        fetchBookings()
+    }, [venue.id])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError('')
 
-        if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-            setError('End date must be after start date')
+        if (!startDate || !endDate) {
+            setError('Please select a date range')
             setLoading(false)
             return
         }
@@ -38,6 +70,8 @@ export default function BookingForm({ venue, onClose }: BookingFormProps) {
                 body: JSON.stringify({
                     venueId: venue.id,
                     ...formData,
+                    startDate: startDate.toISOString().split('T')[0],
+                    endDate: endDate.toISOString().split('T')[0],
                     attendeeCount: parseInt(formData.attendeeCount),
                 }),
             })
@@ -111,7 +145,7 @@ export default function BookingForm({ venue, onClose }: BookingFormProps) {
                             id="companyName"
                             required
                             type="text"
-                            className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-black"
                             value={formData.companyName}
                             onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                         />
@@ -122,34 +156,27 @@ export default function BookingForm({ venue, onClose }: BookingFormProps) {
                             id="email"
                             required
                             type="email"
-                            className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-black"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="startDate" className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
-                            <input
-                                id="startDate"
-                                required
-                                type="date"
-                                className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                value={formData.startDate}
-                                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="endDate" className="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
-                            <input
-                                id="endDate"
-                                required
-                                type="date"
-                                className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                value={formData.endDate}
-                                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                            />
-                        </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Select Dates</label>
+                        <DatePicker
+                            selectsRange={true}
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChange={(update) => {
+                                setDateRange(update);
+                            }}
+                            isClearable={true}
+                            className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-black"
+                            wrapperClassName="w-full"
+                            placeholderText="Select date range"
+                            minDate={new Date()}
+                            excludeDates={excludedDates}
+                        />
                     </div>
                     <div>
                         <label htmlFor="attendeeCount" className="block text-sm font-semibold text-gray-700 mb-2">
@@ -160,7 +187,7 @@ export default function BookingForm({ venue, onClose }: BookingFormProps) {
                             required
                             type="number"
                             max={venue.capacity}
-                            className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            className="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-black"
                             value={formData.attendeeCount}
                             onChange={(e) => setFormData({ ...formData, attendeeCount: e.target.value })}
                         />

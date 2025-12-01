@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PlanRetreat
 
-## Getting Started
+PlanRetreat is a modern web application designed to help companies and groups find and book the perfect venue for their retreats. It features a responsive user interface for browsing venues and a robust API for managing bookings, all built with a microservices architecture.
 
-First, run the development server:
+## 🚀 Features
+
+-   **Venue Discovery**: Browse a curated list of retreat venues with details like capacity, price, and location.
+-   **Smart Booking System**:
+    -   Check venue availability in real-time.
+    -   Prevent double bookings with overlapping date validation.
+    -   Interactive date picker with booked dates disabled.
+-   **Responsive Design**: A beautiful, mobile-friendly UI built with Tailwind CSS.
+-   **Microservices Architecture**: Separate services for the UI (Frontend) and API (Backend) for better scalability and maintenance.
+-   **Containerized Deployment**: Fully dockerized environment for consistent development and production workflows.
+
+## 🛠 Tech Stack
+
+### **UI Service (Frontend)**
+-   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+-   **Components**: React DatePicker, Lucide Icons
+-   **Testing**: Jest, React Testing Library
+
+### **API Service (Backend)**
+-   **Runtime**: [Node.js](https://nodejs.org/)
+-   **Framework**: [Express.js](https://expressjs.com/)
+-   **Database**: [PostgreSQL](https://www.postgresql.org/)
+-   **ORM**: [Prisma](https://www.prisma.io/)
+-   **Validation**: Zod
+-   **Testing**: Jest, Supertest
+
+### **Infrastructure**
+-   **Containerization**: Docker, Docker Compose
+-   **Orchestration**: Shell scripts for automated workflows
+
+---
+
+## 📋 Prerequisites
+
+Ensure you have the following installed on your machine:
+-   [Docker](https://www.docker.com/get-started) & Docker Compose
+-   [Node.js](https://nodejs.org/) (v18+ recommended for local development outside Docker)
+
+---
+
+## 🏁 Getting Started
+
+### 1. Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Swannhs/planretreat_assignment.git
+cd planretreat_assignment
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Running in Development Mode
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The development environment sets up the database and runs the services with hot-reloading enabled.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+./run.sh
+```
 
-## Learn More
+-   **UI**: [http://localhost:3000](http://localhost:3000)
+-   **API**: [http://localhost:4000](http://localhost:4000)
+-   **Database**: PostgreSQL on port `5432`
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Running in Production Mode
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The production script builds optimized Docker images, runs tests, applies migrations, and seeds the database before starting the services.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+./run-prod.sh
+```
 
-## Deploy on Vercel
+-   **UI**: [http://localhost:3000](http://localhost:3000)
+-   **API**: [http://localhost:4000](http://localhost:4000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> **Note**: The production build includes a testing stage. If tests fail, the build will stop, ensuring only stable code is deployed.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🧪 Running Tests
+
+You can run tests for each service individually or as part of the Docker build process.
+
+### **API Service Tests**
+```bash
+cd api-service
+npm test
+```
+
+### **UI Service Tests**
+```bash
+cd ui-service
+npm test
+```
+
+---
+
+## 📂 Project Structure
+
+```
+planretreat/
+├── api-service/            # Backend Express application
+│   ├── prisma/             # Database schema and migrations
+│   ├── src/
+│   │   ├── controllers/    # Request handlers
+│   │   ├── services/       # Business logic
+│   │   ├── repositories/   # Database access layer
+│   │   ├── routes/         # API route definitions
+│   │   └── tests/          # Unit and integration tests
+│   └── Dockerfile          # Dev Dockerfile
+│   └── Dockerfile.prod     # Prod Dockerfile
+│
+├── ui-service/             # Frontend Next.js application
+│   ├── src/
+│   │   ├── app/            # Next.js App Router pages
+│   │   ├── components/     # Reusable UI components
+│   │   └── lib/            # Utility functions
+│   └── Dockerfile          # Dev Dockerfile
+│   └── Dockerfile.prod     # Prod Dockerfile
+│
+├── docker-compose.yml      # Development composition
+├── docker-compose.prod.yml # Production composition
+├── run.sh                  # Development startup script
+└── run-prod.sh             # Production startup script
+```
+
+## 🔌 API Endpoints
+
+### **Venues**
+-   `GET /api/venues`: List all venues (supports pagination).
+-   `GET /api/venues/:id`: Get details of a specific venue.
+
+### **Bookings**
+-   `POST /api/bookings`: Create a new booking.
+    -   **Body**: `{ venueId, companyName, email, startDate, endDate, attendeeCount }`
+-   `GET /api/bookings?venueId=:id`: Get all bookings for a specific venue (used for availability checking).
+
+---
+
+## 🐳 Docker Workflow
+
+-   **Development**: Uses `docker-compose.yml`. Mounts source code as volumes for live updates.
+-   **Production**: Uses `docker-compose.prod.yml`. Builds multi-stage images:
+    1.  **Builder**: Installs dependencies, runs tests, builds the app.
+    2.  **Runner**: Minimal image with only production artifacts.
+
+## 🛡️ Error Handling & Validation
+
+-   **Backend**: Uses `Zod` for strict request validation. Global error handlers ensure consistent JSON error responses.
+-   **Frontend**: Displays user-friendly error messages for validation failures (e.g., invalid dates, capacity exceeded) and API errors.

@@ -7,13 +7,13 @@ export class BookingRepository {
     async create(
         client: DbClient = prisma,
         data: {
-        venueId: number
-        companyName: string
-        email: string
-        startDate: Date
-        endDate: Date
-        attendeeCount: number
-    }) {
+            venueId: number
+            companyName: string
+            email: string
+            startDate: Date
+            endDate: Date
+            attendeeCount: number
+        }) {
         return client.bookingInquiry.create({
             data,
             include: {
@@ -53,6 +53,16 @@ export class BookingRepository {
             where: { id },
             include: {
                 venue: true,
+            },
+        })
+    }
+
+    async findByVenueId(venueId: number) {
+        return prisma.bookingInquiry.findMany({
+            where: { venueId },
+            select: {
+                startDate: true,
+                endDate: true,
             },
         })
     }
