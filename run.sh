@@ -35,8 +35,8 @@ wait_for_api() {
 }
 
 run_migrations() {
-    echo "Running database migrations..."
-    docker-compose exec -T api-service npx prisma migrate deploy
+    echo "Running database migrations (resetting database)..."
+    docker-compose exec -T api-service npx prisma migrate reset --force
     if [ $? -eq 0 ]; then
         echo "Database migrations completed successfully!"
     else
@@ -58,9 +58,8 @@ run_seeding() {
 
 if wait_for_api; then
     run_migrations
-    if [[ "${SEED_FLAG}" == "--seed" ]]; then
-        run_seeding
-    fi
+    # Always run seeding after reset
+    run_seeding
     
     echo "Setup completed successfully! You can access:"
     echo "- UI: http://localhost:3000"

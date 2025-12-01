@@ -1,6 +1,6 @@
 import { ApiErrorResponse, ApiSuccessResponse, VenueListResponse } from '@/lib/api-types'
 
-const API_BASE_URL = 'https://api-service-two-pi.vercel.app'
+const API_BASE_URL = process.env.API_URL || 'http://localhost:4000'
 
 type FetchVenuesResult =
     | { venues: VenueListResponse['data']; meta: VenueListResponse['meta']; error: null }

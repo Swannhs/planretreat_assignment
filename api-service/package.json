@@ -9,8 +9,7 @@
         "prisma:generate": "prisma generate",
         "prisma:push": "prisma db push",
         "prisma:seed": "ts-node prisma/seed.ts",
-        "test": "jest",
-        "postinstall": "prisma generate && prisma db push && npm run prisma:seed"
+        "test": "jest"
     },
     "prisma": {
         "seed": "ts-node prisma/seed.ts"
