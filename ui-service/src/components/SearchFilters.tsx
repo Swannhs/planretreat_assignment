@@ -46,13 +46,8 @@ export default function SearchFilters() {
 
         debounceTimer.current = setTimeout(async () => {
             try {
-                const apiUrl =
-                    process.env.NEXT_PUBLIC_API_URL ||
-                    process.env.API_URL ||
-                    'http://localhost:4000'
-
                 const res = await fetch(
-                    `${apiUrl}/api/venues/suggestions?query=${encodeURIComponent(city)}`,
+                    `/api/venues/suggestions?query=${encodeURIComponent(city)}`,
                     { signal: controller.signal }
                 )
 
