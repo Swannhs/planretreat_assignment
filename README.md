@@ -1,6 +1,24 @@
 # PlanRetreat
 
-PlanRetreat is a modern web application designed to help companies and groups find and book the perfect venue for their retreats. It features a responsive user interface for browsing venues and a robust API for managing bookings, all built with a microservices architecture.
+PlanRetreat is a modern web application designed to help companies and groups find and book the perfect venue for their retreats. It features a responsive user interface for browsing venues and a robust API for managing bookings, all built with a **Three-Tier Architecture**.
+
+## 🏗️ Architecture
+
+The application follows a classic Three-Tier Architecture, ensuring separation of concerns, scalability, and maintainability.
+
+1.  **Presentation Tier (Frontend)**:
+    *   Built with **Next.js 14** (App Router) and **Tailwind CSS**.
+    *   Handles user interactions, venue browsing, and booking forms.
+    *   Communicates with the Logic Tier via REST API.
+
+2.  **Logic Tier (Backend)**:
+    *   Built with **Node.js** and **Express.js**.
+    *   Processes business logic, validates requests (Zod), and manages data flow.
+    *   Exposes a RESTful API documented with **Swagger/OpenAPI**.
+
+3.  **Data Tier (Database)**:
+    *   **PostgreSQL** database for persistent storage.
+    *   Managed via **Prisma ORM** for type-safe database access and migrations.
 
 ## 🚀 Features
 
@@ -10,7 +28,6 @@ PlanRetreat is a modern web application designed to help companies and groups fi
     -   Prevent double bookings with overlapping date validation.
     -   Interactive date picker with booked dates disabled.
 -   **Responsive Design**: A beautiful, mobile-friendly UI built with Tailwind CSS.
--   **Microservices Architecture**: Separate services for the UI (Frontend) and API (Backend) for better scalability and maintenance.
 -   **Containerized Deployment**: Fully dockerized environment for consistent development and production workflows.
 
 ## 🛠 Tech Stack
@@ -126,7 +143,12 @@ planretreat/
 └── run-prod.sh             # Production startup script
 ```
 
-## 🔌 API Endpoints
+## 🔌 API Endpoints & Documentation
+
+The API is fully documented using **Swagger/OpenAPI**. You can explore the endpoints, test requests, and view schemas interactively.
+
+-   **Local Swagger UI**: [http://localhost:4000/api-docs](http://localhost:4000/api-docs)
+-   **Live Swagger UI**: [https://api-service-two-pi.vercel.app/api-docs](https://api-service-two-pi.vercel.app/api-docs)
 
 ### **Venues**
 -   `GET /api/venues`: List all venues (supports pagination).
@@ -136,6 +158,15 @@ planretreat/
 -   `POST /api/bookings`: Create a new booking.
     -   **Body**: `{ venueId, companyName, email, startDate, endDate, attendeeCount }`
 -   `GET /api/bookings?venueId=:id`: Get all bookings for a specific venue (used for availability checking).
+
+---
+
+## 🌐 Live Demo
+
+Check out the live application deployed on Vercel:
+
+-   **Frontend Application**: [https://ui-service-ten.vercel.app/](https://ui-service-ten.vercel.app/)
+-   **Backend API Docs**: [https://api-service-two-pi.vercel.app/api-docs](https://api-service-two-pi.vercel.app/api-docs)
 
 ---
 

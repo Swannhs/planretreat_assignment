@@ -26,3 +26,5 @@ pids
 
 # Coverage
 coverage
+.vercel
+.env*.local

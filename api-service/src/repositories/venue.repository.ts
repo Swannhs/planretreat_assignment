@@ -18,7 +18,6 @@ export class VenueRepository {
         if (filters.city) {
             where.location = {
                 contains: filters.city,
-                mode: 'insensitive',
             }
         }
 
@@ -48,7 +47,6 @@ export class VenueRepository {
         if (filters.city) {
             where.location = {
                 contains: filters.city,
-                mode: 'insensitive',
             }
         }
 
@@ -74,7 +72,6 @@ export class VenueRepository {
             where: {
                 location: {
                     contains: query,
-                    mode: 'insensitive',
                 },
             },
             select: { location: true },
